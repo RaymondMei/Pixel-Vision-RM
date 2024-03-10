@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 function Grid5x5() {
   return (
@@ -39,7 +39,7 @@ function Grid5x5() {
         <span className="border border-4 border-dark bg-white col flex-fill"></span>
       </div>
     </div>
-  )
+  );
 }
 
 export default Grid5x5;
