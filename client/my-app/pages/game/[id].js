@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
 import React from "react";
-import LobbyLayout from "../../components/LobbyLayout";
+import Lobby from "../Lobby";
 import { useState, useEffect } from "react";
 import Game from "../../components/Game";
 import Leaderboard from "../Leaderboard";
-export default function Lobby({ name, socket }) {
+export default function GameInstance({ name, socket }) {
   const router = useRouter();
   var [players, setPlayers] = useState([]);
   var [inGame, setInGame] = useState(false);
@@ -74,7 +74,7 @@ export default function Lobby({ name, socket }) {
     );
   } else {
     return (
-      <LobbyLayout
+      <Lobby
         socket={socket}
         id={router.query.id}
         isCreator={isCreator}

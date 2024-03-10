@@ -10,7 +10,7 @@ if (!process.env.MONGODB_URI) {
   throw new Error("Did not provide MongoDB_URI"); // requires each dev to make an .env file with the mongodb uri
 }
 const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB = "Cluster0";
+const MONGODB_DB = "PixelVision";
 const MongoClient = require("mongodb").MongoClient;
 const server = http.createServer(app);
 

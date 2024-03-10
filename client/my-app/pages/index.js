@@ -13,8 +13,15 @@ function Home({ name, lobby, setName, setLobby, socket }) {
   const createLobby = () => {
     if (name !== "") {
       const id = socket.id;
-      socket.emit("create_lobby", { name, id });
-      router.replace(`/game/${socket.id}`);
+      socket.timeout(5000).emit("create_lobby", { id, name }, (err, res) => {
+        if (err) {
+          console.log(`Error: ${res["errMsg"] ?? ""}. ${err}`);
+        } else if ("code" in res) {
+          console.log("Created lobby " + res["code"]);
+        }
+      });
+
+      // router.replace(`/game/${socket.id}`);
     }
   };
 
