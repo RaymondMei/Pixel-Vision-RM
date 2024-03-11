@@ -41,7 +41,7 @@ const mongoClient = new MongoClient(MONGODB_URI, {
   },
 });
 
-const connectDB = async () => {
+const runServer = async () => {
   try {
     await mongoClient.connect();
     console.log("Connected to MongoDB Client.");
@@ -56,17 +56,47 @@ const connectDB = async () => {
         // name: id: player's socket id, player's username
         const { id, name } = data;
 
-        socket.join(id);
-
+        // create lobby with player's socket id as lobby code
         lobbies
           .insertOne({ code: id, players: [name] })
           .then(() => {
-            console.log("hi");
-            callback({ code: id });
+            socket.join(id);
+            callback({ success: true, data: { code: id, players: [name] } });
           })
-          .catch((err) =>
-            callback({ errMsg: "Could not create lobby. " + err })
+          .catch((err) => {
+            callback({ success: false, errMsg: "Could not create lobby." });
+          });
+      });
+
+      socket.on("join_lobby", async (data, callback) => {
+        const { lobbyCode, name } = data;
+
+        // find lobby with given code
+        let lobby = await lobbies.findOne({ code: lobbyCode });
+        if (!lobby) {
+          callback({
+            success: false,
+            errMsg: `Could not find lobby ${lobbyCode}.`,
+          });
+          return;
+        }
+
+        // append the new player's name into that collection
+        try {
+          lobby = await lobbies.findOneAndUpdate(
+            { code: lobbyCode },
+            { $push: { players: name } },
+            { returnDocument: "after" }
           );
+          socket.join(lobbyCode);
+          callback({ success: true, data: lobby.value });
+        } catch (e) {
+          callback({
+            success: false,
+            errMsg: `Could not join lobby ${lobbyCode}.`,
+          });
+        }
+        io.sockets.in(lobbyCode).emit("update_lobby", lobby.value);
       });
     });
   } catch {
@@ -74,6 +104,6 @@ const connectDB = async () => {
   }
 };
 
-connectDB().catch(console.dir);
+runServer().catch(console.dir);
 
 server.listen(4000, () => "Server listening on port 4000");

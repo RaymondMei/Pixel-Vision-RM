@@ -3,39 +3,53 @@ import Grid5x5 from "../components/Grid5x5";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-function Home({ name, lobby, setName, setLobby, socket }) {
+function Home({
+  name,
+  lobbyCode,
+  setName,
+  setLobbyCode,
+  setLobbyData,
+  socket,
+}) {
   const router = useRouter();
-  const joinLobby = () => {
-    if (lobby !== "" && name !== "") {
-      socket.emit("join_lobby", { name, lobby });
-    }
-  };
+
   const createLobby = () => {
     if (name !== "") {
       const id = socket.id;
       socket.timeout(5000).emit("create_lobby", { id, name }, (err, res) => {
-        if (err) {
-          console.log(`Error: ${res["errMsg"] ?? ""}. ${err}`);
-        } else if ("code" in res) {
-          console.log("Created lobby " + res["code"]);
+        if (err || !res.success) {
+          document.querySelector(".invalid").innerHTML = `Error: ${
+            res.errMsg ?? ""
+          }.`;
+          console.log(`Error: ${res["errMsg"] ?? ""}.`);
+        } else if (res.success && "code" in res.data) {
+          console.log("Created lobby " + res.data.code);
+          setLobbyData(res.data);
+          router.push(`/game/${socket.id}`);
         }
       });
-
-      // router.replace(`/game/${socket.id}`);
     }
   };
 
-  useEffect(() => {
-    socket.on("invalid_lobby", () => {
-      document.querySelector(".invalid").innerHTML = "INVALID LOBBY CODE!";
-    });
-    socket.on("valid_lobby", (data) => {
-      router.push(`/game/${data.lobby}`).then(() => {
-        socket.emit("moved_lobbies");
-        return;
-      });
-    });
-  }, [socket]);
+  const joinLobby = () => {
+    if (lobbyCode !== "" && name !== "") {
+      socket
+        .timeout(5000)
+        .emit("join_lobby", { lobbyCode, name }, (err, res) => {
+          console.log(err, res);
+          if (err || !res.success) {
+            document.querySelector(".invalid").innerHTML = `Error: ${
+              res.errMsg ?? ""
+            }.`;
+            console.log(`Error: ${res["errMsg"] ?? ""}. ${err}`);
+          } else if (res.success && "code" in res.data) {
+            console.log("Joined lobby " + res.data.code);
+            setLobbyData(res.data);
+            router.push(`/game/${lobbyCode}`);
+          }
+        });
+    }
+  };
 
   return (
     <div className="h-100 position-absolute container-fluid d-flex flex-column">
@@ -63,7 +77,7 @@ function Home({ name, lobby, setName, setLobby, socket }) {
                 className="form-control"
                 type="text"
                 placeholder="CODE"
-                onChange={(e) => setLobby(e.target.value)}
+                onChange={(e) => setLobbyCode(e.target.value)}
               />
               <button
                 className="btn btn-success"

@@ -4,9 +4,9 @@ import Lobby from "../Lobby";
 import { useState, useEffect } from "react";
 import Game from "../../components/Game";
 import Leaderboard from "../Leaderboard";
-export default function GameInstance({ name, socket }) {
+export default function GameInstance({ name, socket, lobbyData }) {
   const router = useRouter();
-  var [players, setPlayers] = useState([]);
+  var [players, setPlayers] = useState(lobbyData?.players ?? []);
   var [inGame, setInGame] = useState(false);
   const [boxes, setBoxes] = useState([]);
   const [round, setRound] = useState(0);
@@ -14,8 +14,8 @@ export default function GameInstance({ name, socket }) {
   const [endGame, setEndGame] = useState(false);
   let globalMaxRounds = -1;
 
-  //updates number of players
   useEffect(() => {
+    // new player joins the lobby
     socket.on("update_lobby", (data) => {
       setPlayers(data.players);
     });

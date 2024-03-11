@@ -17,25 +17,25 @@ function SettingsPane({ socket, lobby, players }) {
       <h1 className="text-center"> Settings </h1>
       <div className="h-75 d-flex flex-column justify-content-between">
         <div className="h-75 p-2 d-flex flex-column justify-content-between">
-          <div class="form-group pb-3">
-            <label for="gameSettingsLobbyName" className="form-label fs-5">
+          <div className="form-group pb-3">
+            <label htmlFor="gameSettingsLobbyName" className="form-label fs-5">
               Lobby Name
             </label>
             <input
               className="form-control form-control-lg"
               placeholder="My Lobby"
               id="gameSettingsLobbyName"
-              maxlength="25"
+              maxLength="25"
             />
           </div>
-          <div class="form-group pb-3">
-            <label for="gameSettingsLobbyName" className="form-label fs-5">
+          <div className="form-group pb-3">
+            <label htmlFor="gameSettingsLobbyName" className="form-label fs-5">
               Max Players
             </label>
-            <select class="form-select form-select-lg" id="players-select">
+            <select className="form-select form-select-lg" id="players-select">
               <option value="2">2</option>
               <option value="3">3</option>
-              <option value="4" selected="selected">
+              <option value="4" defaultValue>
                 4
               </option>
               <option value="5">5</option>
@@ -44,17 +44,17 @@ function SettingsPane({ socket, lobby, players }) {
               <option value="8">8</option>
             </select>
           </div>
-          <div class="form-group pb-3">
-            <label for="gameSettingsLobbyName" className="form-label fs-5">
+          <div className="form-group pb-3">
+            <label htmlFor="gameSettingsLobbyName" className="form-label fs-5">
               Drawing Time (Seconds)
             </label>
-            <select class="form-select form-select-lg" id="time-select">
+            <select className="form-select form-select-lg" id="time-select">
               <option value="15">15</option>
               <option value="30">30</option>
               <option value="45">45</option>
               <option value="60">60</option>
               <option value="75">75</option>
-              <option value="90" selected="selected">
+              <option value="90" defaultValue>
                 90
               </option>
               <option value="100">100</option>
@@ -64,13 +64,13 @@ function SettingsPane({ socket, lobby, players }) {
               <option value="200">215</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="gameSettingsLobbyName" className="form-label fs-5">
+          <div className="form-group">
+            <label htmlFor="gameSettingsLobbyName" className="form-label fs-5">
               Rounds
             </label>
-            <select class="form-select form-select-lg" id="rounds-select">
+            <select className="form-select form-select-lg" id="rounds-select">
               <option value="2">2</option>
-              <option value="3" selected="selected">
+              <option value="3" defaultValue>
                 3
               </option>
               <option value="4">4</option>

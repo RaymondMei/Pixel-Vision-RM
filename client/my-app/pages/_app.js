@@ -8,7 +8,8 @@ const socket = io.connect("http://localhost:4000");
 
 function MyApp({ Component, pageProps }) {
   const [name, setName] = useState("");
-  const [lobby, setLobby] = useState("");
+  const [lobbyData, setLobbyData] = useState(null);
+  const [lobbyCode, setLobbyCode] = useState("");
   return (
     <>
       <Head>
@@ -25,9 +26,11 @@ function MyApp({ Component, pageProps }) {
       <Component
         {...pageProps}
         name={name}
-        lobby={lobby}
+        lobbyCode={lobbyCode}
         setName={setName}
-        setLobby={setLobby}
+        setLobbyCode={setLobbyCode}
+        lobbyData={lobbyData}
+        setLobbyData={setLobbyData}
         socket={socket}
       />
     </>
