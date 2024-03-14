@@ -98,6 +98,13 @@ const runServer = async () => {
         }
         io.sockets.in(lobbyCode).emit("update_lobby", lobby.value);
       });
+
+      socket.on("start_game_req", async (data) => {
+        const { lobbyCode, score, round } = data;
+        io.sockets
+          .in(lobbyCode)
+          .emit("start_game", data, (err, res) => console.log(err, res));
+      });
     });
   } catch {
     console.log("Error connecting to MongoDB.");
