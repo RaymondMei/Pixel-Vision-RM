@@ -4,21 +4,42 @@ import Lobby from "../Lobby";
 import { useState, useEffect } from "react";
 import Game from "../../components/Game";
 import Leaderboard from "../Leaderboard";
-export default function GameInstance({ name, socket, lobbyData }) {
+export default function GameInstance({
+  name,
+  socket,
+  lobbyData,
+  setLobbyData,
+}) {
   const router = useRouter();
-  var [players, setPlayers] = useState(lobbyData?.players ?? []);
-  var [inGame, setInGame] = useState(false);
+  const [inGame, setInGame] = useState(false);
   const [boxes, setBoxes] = useState([]);
   const [round, setRound] = useState(0);
-  const [score, setScore] = useState(new Array(players.length).fill(0));
+  const [score, setScore] = useState(
+    new Array(lobbyData?.players.length).fill(0)
+  );
   const [endGame, setEndGame] = useState(false);
   let globalMaxRounds = -1;
+
+  const [settings, setSettings] = useState({
+    lobbyName: "My Lobby",
+    maxPlayer: 2,
+    drawingTime: 30,
+    rounds: 2,
+  });
+
+  const startGame = (settings) => {
+    setSettings(settings);
+    lobbyData.settings = settings;
+    socket.emit("start_game_req", { lobbyData });
+  };
 
   useEffect(() => {
     // new player joins the lobby
     socket.on("update_lobby", (data) => {
-      setPlayers(data.players);
+      setLobbyData(data);
     });
+
+    socket.on("start_pre_round", (lobbyData) => {});
 
     //note:
     //game starts on round_0
@@ -47,12 +68,11 @@ export default function GameInstance({ name, socket, lobbyData }) {
       setBoxes(data.boxes);
     });
   }, [socket]);
-  const isCreator = socket.id == router.query.id;
 
   if (endGame) {
     return (
       <Leaderboard
-        players={players}
+        players={lobbyData?.players}
         scores={score}
         maxRounds={globalMaxRounds}
       />
@@ -66,20 +86,33 @@ export default function GameInstance({ name, socket, lobbyData }) {
         setBoxes={setBoxes}
         round={round}
         timeLimit={5 * round}
-        isCreator={isCreator}
-        playerID={players.findIndex((player) => player === name)}
+        adminId={adminId}
+        playerID={lobbyData?.players.findIndex(
+          (player) => player.name === name
+        )}
         socket={socket}
-        players={players}
+        players={lobbyData?.players}
+      />
+    );
+  } else if (lobbyData) {
+    return (
+      <Lobby
+        socket={socket}
+        lobbyCode={lobbyData?.code}
+        adminId={lobbyData?.adminId}
+        players={lobbyData?.players}
+        startGame={startGame}
       />
     );
   } else {
     return (
-      <Lobby
-        socket={socket}
-        id={router.query.id}
-        isCreator={isCreator}
-        players={players}
-      />
+      <div className="d-flex w-100 h-100 justify-content-center align-items-center">
+        <div className="card text-center p-5">
+          <h1>404</h1>
+          <h2>Page Not Found</h2>
+          <p>Sorry, the page you are looking for does not exist.</p>
+        </div>
+      </div>
     );
   }
 }

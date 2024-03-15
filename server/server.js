@@ -53,15 +53,25 @@ const runServer = async () => {
       console.log(`User connected to socket ${socket.id}`);
 
       socket.on("create_lobby", async (data, callback) => {
-        // name: id: player's socket id, player's username
-        const { id, name } = data;
+        const { playerId, name } = data;
 
         // create lobby with player's socket id as lobby code
         lobbies
-          .insertOne({ code: id, players: [name] })
+          .insertOne({
+            code: playerId,
+            adminId: playerId,
+            players: [{ playerId: playerId, name: name, score: 0 }],
+          })
           .then(() => {
-            socket.join(id);
-            callback({ success: true, data: { code: id, players: [name] } });
+            socket.join(playerId);
+            callback({
+              success: true,
+              data: {
+                code: playerId,
+                adminId: playerId,
+                players: [{ playerId: playerId, name: name, score: 0 }],
+              },
+            });
           })
           .catch((err) => {
             callback({ success: false, errMsg: "Could not create lobby." });
@@ -69,7 +79,7 @@ const runServer = async () => {
       });
 
       socket.on("join_lobby", async (data, callback) => {
-        const { lobbyCode, name } = data;
+        const { lobbyCode, playerId, name } = data;
 
         // find lobby with given code
         let lobby = await lobbies.findOne({ code: lobbyCode });
@@ -85,7 +95,9 @@ const runServer = async () => {
         try {
           lobby = await lobbies.findOneAndUpdate(
             { code: lobbyCode },
-            { $push: { players: name } },
+            {
+              $push: { players: { playerId: playerId, name: name, score: 0 } },
+            },
             { returnDocument: "after" }
           );
           socket.join(lobbyCode);
@@ -99,11 +111,12 @@ const runServer = async () => {
         io.sockets.in(lobbyCode).emit("update_lobby", lobby.value);
       });
 
-      socket.on("start_game_req", async (data) => {
-        const { lobbyCode, score, round } = data;
+      socket.on("start_game_req", async (lobbyData) => {
         io.sockets
-          .in(lobbyCode)
-          .emit("start_game", data, (err, res) => console.log(err, res));
+          .in(lobby.code)
+          .emit("start_pre_round", lobbyData, (err, res) =>
+            console.log(err, res)
+          );
       });
     });
   } catch {

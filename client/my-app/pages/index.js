@@ -13,21 +13,24 @@ function Home({
 }) {
   const router = useRouter();
 
+  const playerId = socket.id;
+
   const createLobby = () => {
     if (name !== "") {
-      const id = socket.id;
-      socket.timeout(5000).emit("create_lobby", { id, name }, (err, res) => {
-        if (err || !res.success) {
-          document.querySelector(".invalid").innerHTML = `Error: ${
-            res.errMsg ?? ""
-          }.`;
-          console.log(`Error: ${res["errMsg"] ?? ""}.`);
-        } else if (res.success && "code" in res.data) {
-          console.log("Created lobby " + res.data.code);
-          setLobbyData(res.data);
-          router.push(`/game/${socket.id}`);
-        }
-      });
+      socket
+        .timeout(5000)
+        .emit("create_lobby", { playerId, name }, (err, res) => {
+          if (err || !res.success) {
+            document.querySelector(".invalid").innerHTML = `Error: ${
+              res.errMsg ?? ""
+            }.`;
+            console.log(`Error: ${res["errMsg"] ?? ""}.`);
+          } else if (res.success && "code" in res.data) {
+            console.log("Created lobby " + res.data.code);
+            setLobbyData(res.data);
+            router.push(`/game/${res.data.code}`);
+          }
+        });
     }
   };
 
@@ -35,7 +38,7 @@ function Home({
     if (lobbyCode !== "" && name !== "") {
       socket
         .timeout(5000)
-        .emit("join_lobby", { lobbyCode, name }, (err, res) => {
+        .emit("join_lobby", { lobbyCode, playerId, name }, (err, res) => {
           console.log(err, res);
           if (err || !res.success) {
             document.querySelector(".invalid").innerHTML = `Error: ${
