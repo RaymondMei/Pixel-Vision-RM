@@ -37,7 +37,7 @@ const GameGrid = ({ width, height, colour, boxes, setBoxes }) => {
   return (
     <table
       className="square100"
-      style={{ "table-layout": "fixed", border: "5px solid black" }}
+      style={{ tableLayout: "fixed", border: "5px solid black" }}
     >
       <tbody>{rows}</tbody>
     </table>

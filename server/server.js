@@ -4,6 +4,7 @@ import http from "http";
 import cors from "cors";
 import { Server } from "socket.io";
 import { MongoClient, ServerApiVersion } from "mongodb";
+import { initializeGameGrid } from "./game_utils.js";
 
 dotenv.config();
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -111,12 +112,25 @@ const runServer = async () => {
         io.sockets.in(lobbyCode).emit("update_lobby", lobby.value);
       });
 
-      socket.on("start_game_req", async (lobbyData) => {
-        io.sockets
-          .in(lobby.code)
-          .emit("start_pre_round", lobbyData, (err, res) =>
-            console.log(err, res)
+      socket.on("start_game_req", async (lobbyData, callback) => {
+        const grid = initializeGameGrid(3);
+        try {
+          const lobby = await lobbies.findOneAndUpdate(
+            { code: lobbyData.code },
+            {
+              $set: { round: 1, grid: grid },
+            },
+            { returnDocument: "after" }
           );
+          callback({ success: true, data: lobby.value });
+
+          io.sockets.in(lobby.value.code).emit("start_pre_round", lobby.value);
+        } catch (e) {
+          callback({
+            success: false,
+            errMsg: "Could not start game",
+          });
+        }
       });
     });
   } catch {

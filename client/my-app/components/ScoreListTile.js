@@ -1,13 +1,13 @@
 import React from "react";
 
-function ScoreListTile({ username, color, score, isAdmin }) {
+function ScoreListTile({ player, color, isAdmin }) {
   return (
     <div
       className="p-4 fs-3 text-center border-bottom list-group-item list-group-item-action"
       style={{ color: color }}
     >
-      <span className="start-0 ms-5 position-absolute">{`${score} `}</span>
-      <span>{`${username}`}</span>
+      <span className="start-0 ms-5 position-absolute">{`${player.score} `}</span>
+      <span>{`${player.name}`}</span>
 
       {isAdmin ? <AdminBadge /> : null}
     </div>

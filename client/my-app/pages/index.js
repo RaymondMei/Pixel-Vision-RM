@@ -39,7 +39,6 @@ function Home({
       socket
         .timeout(5000)
         .emit("join_lobby", { lobbyCode, playerId, name }, (err, res) => {
-          console.log(err, res);
           if (err || !res.success) {
             document.querySelector(".invalid").innerHTML = `Error: ${
               res.errMsg ?? ""

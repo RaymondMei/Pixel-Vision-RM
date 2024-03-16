@@ -13,7 +13,7 @@ const colorList = [
 ];
 
 //displays players and their scores
-function ScoreList({ players, scores }) {
+function ScoreList({ players, adminId }) {
   let listIndex = -1;
   return (
     <div className="h-100 d-flex flex-column justify-content-start overflow-auto list-group list-group-flush">
@@ -21,10 +21,10 @@ function ScoreList({ players, scores }) {
         listIndex = (listIndex + 1) % 8;
         return (
           <ScoreListTile
-            username={player}
+            key={player.playerId}
+            player={player}
             color={colorList[listIndex]}
-            score={scores[listIndex]}
-            isAdmin={listIndex == 0}
+            isAdmin={player.playerId === adminId}
           />
         );
       })}

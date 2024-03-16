@@ -5,7 +5,7 @@ import ScoreList from "./ScoreList";
 function Game({
   boxes,
   setBoxes,
-  score,
+  adminId,
   timeLimit,
   isCreator,
   round,
@@ -18,7 +18,6 @@ function Game({
   //the data.round increments during the whiteboard time, so the correct displayed round is ceil(data.round/2)
 
   const router = useRouter();
-  console.log(colour);
   const [timer, setTimer] = useState(timeLimit);
   //changes gameState: display round number, alternate between memorizing and guessing round events, display timer
   useEffect(() => {
@@ -69,14 +68,14 @@ function Game({
             setBoxes={setBoxes}
           />
         </div>
-        <div className="colours col-5 d-flex flex-row justify-content-center gap-4 position-absolute top-0 p-5">
+        <div className="colours col-5 d-flex flex-row justify-content-center gap-4 position-absolute top-0 p-3">
           <div
             className="rounded-circle shadow-lg border border-3 border-dark"
             style={{
-              "aspect-ratio": "1 / 1",
+              aspectRatio: "1 / 1",
               height: "100%",
               minHeight: "10px",
-              "background-color": "red",
+              backgroundColor: "red",
               cursor: "pointer",
             }}
             onClick={() => {
@@ -86,10 +85,10 @@ function Game({
           <div
             className="rounded-circle shadow-lg border border-3 border-dark"
             style={{
-              "aspect-ratio": "1 / 1",
+              aspectRatio: "1 / 1",
               height: "100%",
               minHeight: "10px",
-              "background-color": "blue",
+              backgroundColor: "blue",
               cursor: "pointer",
             }}
             onClick={() => setColour("blue")}
@@ -97,10 +96,10 @@ function Game({
           <div
             className="rounded-circle shadow-lg border border-3 border-dark"
             style={{
-              "aspect-ratio": "1 / 1",
+              aspectRatio: "1 / 1",
               height: "100%",
               minHeight: "10px",
-              "background-color": "yellow",
+              backgroundColor: "yellow",
               cursor: "pointer",
             }}
             onClick={() => setColour("yellow")}
@@ -108,10 +107,10 @@ function Game({
           <div
             className="rounded-circle shadow-lg border border-3 border-dark"
             style={{
-              "aspect-ratio": "1 / 1",
+              aspectRatio: "1 / 1",
               height: "100%",
               minHeight: "10px",
-              "background-color": "green",
+              backgroundColor: "green",
               cursor: "pointer",
             }}
             onClick={() => setColour("green")}
@@ -119,17 +118,17 @@ function Game({
           <div
             className="rounded-circle shadow-lg border border-3 border-dark"
             style={{
-              "aspect-ratio": "1 / 1",
+              aspectRatio: "1 / 1",
               height: "100%",
               minHeight: "10px",
-              "background-color": "black",
+              backgroundColor: "black",
               cursor: "pointer",
             }}
             onClick={() => setColour("black")}
           ></div>
         </div>
         <div className="h-75 bg-light rounded shadow col-sm-3 d-flex flex-column justify-content-around overflow-auto">
-          <ScoreList players={players} scores={score} />
+          <ScoreList players={players} adminId={adminId} />
         </div>
       </div>
     </>
