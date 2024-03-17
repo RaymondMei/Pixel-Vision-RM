@@ -2,19 +2,15 @@ import Router from "next/router";
 import React from "react";
 import RankTable from "../components/rankTable";
 
-function Leaderboard({ players, scores }) {
+function Leaderboard({ players }) {
   const data = players.map((player, index) => {
     return {
-      id: index + 1,
-      username: player,
-      score: scores[index],
+      rank: index + 1,
+      username: player.name,
+      score: player.score,
     };
   });
   data.sort((a, b) => b.score - a.score);
-
-  const goLobby = () => {
-    Router.push("/");
-  };
 
   return (
     <div className="container-fluid mt-4 row justify-content-center">
@@ -29,7 +25,7 @@ function Leaderboard({ players, scores }) {
           type="button"
           className="btn btn-dark btn-lg"
           value="Home"
-          onClick={goLobby}
+          onClick={() => Router.push("/")}
         />
       </div>
     </div>

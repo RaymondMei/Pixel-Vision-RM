@@ -5,26 +5,21 @@ function RankTable({ data }) {
   //displays list of players with their rank, username, and score
   const rows = data.map((item, index) => {
     return (
-      <tr key={item.id}>
-        <td className="text-white">{index + 1}</td>
-        {index == 0 ? (
-          <td className="text-white">
-            {item.username}
+      <tr key={item.rank}>
+        <td className="text-white">
+          {item.rank == 1 ? (
             <span className="badge bg-warning">1st</span>
-          </td>
-        ) : index == 1 ? (
-          <td className="text-white">
-            {item.username}
+          ) : item.rank == 2 ? (
             <span className="badge bg-secondary">2st</span>
-          </td>
-        ) : index == 2 ? (
-          <td className="text-white">
-            {item.username}
+          ) : item.rank == 3 ? (
             <span className="badge bg-danger">3rd</span>
-          </td>
-        ) : (
-          <td className="text-white">{item.username}</td>
-        )}
+          ) : (
+            <span>{item.rank}</span>
+          )}
+        </td>
+        <td className="text-white">
+          <span>{item.username}</span>
+        </td>
         <td className="text-white">{item.score}</td>
       </tr>
     );
