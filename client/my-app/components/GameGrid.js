@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const GameGrid = ({ width, height, colour, boxes, setBoxes }) => {
+const GameGrid = ({ inGame, width, height, colour, boxes, setBoxes }) => {
   const [isMouseDown, setIsMouseDown] = useState(false);
   // Function to toggle the state of a box
   const toggleBox = (row, col) => {
@@ -18,17 +18,23 @@ const GameGrid = ({ width, height, colour, boxes, setBoxes }) => {
     for (let j = 0; j < width; j++) {
       const boxColor = boxes[i][j];
       cols.push(
-        <td
-          className="gh gw"
-          key={j}
-          style={{ border: "5px solid black", backgroundColor: boxColor }}
-          onMouseDownCapture={() => toggleBox(i, j)}
-          onMouseEnter={() => isMouseDown && toggleBox(i, j)}
-          onMouseDown={() => setIsMouseDown(true)}
-          onMouseUp={() => setIsMouseDown(false)}
-        >
-          {}
-        </td>
+        inGame ? (
+          <td
+            className="gh gw"
+            key={j}
+            style={{ border: "5px solid black", backgroundColor: boxColor }}
+            onMouseDownCapture={() => toggleBox(i, j)}
+            onMouseEnter={() => isMouseDown && toggleBox(i, j)}
+            onMouseDown={() => setIsMouseDown(true)}
+            onMouseUp={() => setIsMouseDown(false)}
+          ></td>
+        ) : (
+          <td
+            className="gh gw"
+            key={j}
+            style={{ border: "5px solid black", backgroundColor: boxColor }}
+          ></td>
+        )
       );
     }
     rows.push(<tr key={i}>{cols}</tr>);

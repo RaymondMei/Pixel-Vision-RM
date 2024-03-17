@@ -4,7 +4,7 @@ import http from "http";
 import cors from "cors";
 import { Server } from "socket.io";
 import { MongoClient, ServerApiVersion } from "mongodb";
-import { initializeGameGrid } from "./game_utils.js";
+import { calculateScore, initializeGameGrid } from "./game_utils.js";
 
 dotenv.config();
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -118,7 +118,7 @@ const runServer = async () => {
           const lobby = await lobbies.findOneAndUpdate(
             { code: lobbyData.code },
             {
-              $set: { round: 1, grid: grid },
+              $set: { settings: lobbyData.settings, round: 1, grid: grid },
             },
             { returnDocument: "after" }
           );
@@ -132,6 +132,50 @@ const runServer = async () => {
           });
         }
       });
+
+      socket.on(
+        "end_round",
+        async ({ lobbyData, playerId, guess }, callback) => {
+          const guessScore = calculateScore(lobbyData.grid, guess);
+          (lobbyData.receivedEvent ?? []).push(true);
+          try {
+            const lobby = await lobbies.findOneAndUpdate(
+              { code: lobbyData.code },
+              {
+                $set: {
+                  round: lobbyData.round + 1,
+                  players: lobbyData.players.map((player) => {
+                    if (player.playerId === playerId) {
+                      const updatedScore = player.score + guessScore;
+                      player = { ...player, score: updatedScore };
+                    }
+                    return player;
+                  }),
+                  receivedEvent: lobbyData.receivedEvent,
+                },
+              },
+              { returnDocument: "after" }
+            );
+            callback({ success: true, data: lobby.value.players });
+
+            if (
+              lobbyData.receivedEvent.filter((v) => v).length ===
+              lobbyData.players.length
+            ) {
+              console
+                .log("emit start pre-round")
+                /*   io.sockets
+                .in(lobby.value.code)
+             */ .emit("start_pre_round", lobby.value);
+            }
+          } catch (e) {
+            callback({
+              success: false,
+              errMsg: "Could not update player score",
+            });
+          }
+        }
+      );
     });
   } catch {
     console.log("Error connecting to MongoDB.");

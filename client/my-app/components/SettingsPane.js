@@ -22,7 +22,8 @@ function SettingsPane({ socket, startGame }) {
       lobbyName: lobbyName,
       maxPlayer: parseInt(document.querySelector("#players-select").value) ?? 2,
       drawingTime: parseInt(document.querySelector("#time-select").value) ?? 30,
-      rounds: parseInt(document.querySelector("#rounds-select").value) ?? 2,
+      totalRounds:
+        parseInt(document.querySelector("#rounds-select").value) ?? 2,
     };
     console.log("settings", settings);
     startGame(settings);
@@ -71,6 +72,7 @@ function SettingsPane({ socket, startGame }) {
               id="time-select"
               defaultValue={"90"}
             >
+              <option value="5">5</option>
               <option value="15">15</option>
               <option value="30">30</option>
               <option value="45">45</option>

@@ -4,21 +4,18 @@ import Lobby from "../Lobby";
 import { useState, useEffect } from "react";
 import Game from "../../components/Game";
 import Leaderboard from "../Leaderboard";
-export default function GameInstance({
-  name,
-  socket,
-  lobbyData,
-  setLobbyData,
-}) {
+
+export const roundStates = {
+  beforeGame: 0,
+  preRound: 1,
+  inGame: 2,
+  postRound: 3,
+  afterGame: 4,
+};
+
+export default function GameInstance({ socket, lobbyData, setLobbyData }) {
   const router = useRouter();
   const playerId = socket.id;
-  const roundStates = {
-    beforeGame: 0,
-    preRound: 1,
-    inGame: 2,
-    postRound: 3,
-    afterGame: 4,
-  };
   const [roundStatus, setRoundStatus] = useState(roundStates.beforeGame);
   const [boxes, setBoxes] = useState([]);
   const [round, setRound] = useState(0);
@@ -31,18 +28,50 @@ export default function GameInstance({
     lobbyName: "My Lobby",
     maxPlayer: 2,
     drawingTime: 30,
-    rounds: 2,
+    totalRounds: 2,
   });
 
   const startGame = (settings) => {
     setSettings(settings);
     lobbyData.settings = settings;
     socket.emit("start_game_req", lobbyData, (err, res) => {
-      console.log(res, err);
       if (err || !res.success) {
         console.log(`Error: ${err["errMsg"] ?? ""}. ${err}`);
       }
     });
+  };
+
+  const handleChangeRoundStatus = (prev, cur, grid = []) => {
+    if (prev === roundStates.preRound && cur === roundStates.inGame) {
+      // memo round end and start drawing round
+      const blankGrid = new Array(boxes.length)
+        .fill("white")
+        .map(() => new Array(boxes.length).fill("white"));
+      setBoxes(blankGrid);
+      setRoundStatus(roundStates.inGame);
+    } else if (prev === roundStates.inGame && cur === roundStates.preRound) {
+      // (new round) drawing round end and new memo round
+      socket.emit(
+        "end_round",
+        {
+          lobbyData: lobbyData,
+          playerId: socket.id,
+          guess: boxes,
+        },
+        (res) => {
+          if (!res.success) {
+            document.querySelector(".invalid").innerHTML = `Error: ${
+              res.errMsg ?? ""
+            }.`;
+            console.log(`Error: ${res["errMsg"] ?? ""}. ${err}`);
+          } else if (res.success) {
+            setLobbyData({ ...lobbyData, players: [...res.data] });
+          }
+        }
+      );
+      // setBoxes(grid);
+      // setRoundStatus(roundStates.preRound);
+    }
   };
 
   useEffect(() => {
@@ -52,7 +81,7 @@ export default function GameInstance({
     });
 
     socket.on("start_pre_round", (lobbyData) => {
-      console.log("start_pre_round", lobbyData);
+      setLobbyData(lobbyData);
       setBoxes(lobbyData.grid);
       setRound(lobbyData.round);
       setScore(
@@ -103,14 +132,23 @@ export default function GameInstance({
     case roundStates.postRound:
       return (
         <Game
+          roundStatus={roundStatus}
+          setRoundStatus={setRoundStatus}
+          handleChangeRoundStatus={handleChangeRoundStatus}
+          lobbyData={lobbyData}
+          setLobbyData={setLobbyData}
           score={score}
           boxes={boxes}
           setBoxes={setBoxes}
           round={round}
-          timeLimit={5 * round}
+          timeLimit={
+            roundStatus === roundStates.inGame
+              ? lobbyData?.settings?.drawingTime ?? 90
+              : Math.ceil((lobbyData?.settings?.drawingTime ?? 25) / 5)
+          }
           adminId={lobbyData?.adminId}
-          playerID={lobbyData?.players.findIndex(
-            (player) => player.name === name
+          playerId={lobbyData?.players.findIndex(
+            (player) => player.playerId === playerId
           )}
           socket={socket}
           players={lobbyData?.players}
