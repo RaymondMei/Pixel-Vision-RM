@@ -137,36 +137,32 @@ const runServer = async () => {
         "end_round",
         async ({ lobbyData, playerId, guess }, callback) => {
           const guessScore = calculateScore(lobbyData.grid, guess);
-          lobbyData.receivedEvent = [
-            ...(lobbyData.receivedEvent ?? []),
-            playerId,
-          ];
           try {
-            let lobby = await lobbies.findOneAndUpdate(
+            let lobby = await lobbies.findOne({ code: lobbyData.code });
+            lobby = await lobbies.findOneAndUpdate(
               { code: lobbyData.code },
               {
                 $set: {
-                  players: lobbyData.players.map((player) => {
+                  players: lobby.players.map((player) => {
                     if (player.playerId === playerId) {
                       const updatedScore = player.score + guessScore;
                       player = { ...player, score: updatedScore };
                     }
                     return player;
                   }),
-                  receivedEvent: lobbyData.receivedEvent,
+                },
+                $push: {
+                  receivedEvent: playerId,
                 },
               },
               { returnDocument: "after" }
             );
-            callback({ success: true, data: lobby.value.players });
 
-            console.log("l", lobbyData.receivedEvent, lobbyData.players.length);
             // ensure all clients have emitted a end_round event
-            if (lobbyData.receivedEvent.length === lobbyData.players.length) {
+            if (
+              lobby.value.receivedEvent.length === lobby.value.players.length
+            ) {
               console.log("emit start pre-round");
-              // io.sockets
-              //   .in(lobby.value.code)
-              //   .emit("start_game_req", lobby.value, () => {});
 
               const nextRoundGrid = initializeGameGrid(3);
               try {
@@ -186,7 +182,10 @@ const runServer = async () => {
                   .in(lobby.value.code)
                   .emit("start_pre_round", lobby.value);
               } catch (e) {
-                console.log("Could not start new round.");
+                callback({
+                  success: false,
+                  errMsg: "Could not start new round.",
+                });
               }
             }
           } catch (e) {

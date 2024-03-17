@@ -37,15 +37,14 @@ function Game({
   useEffect(() => {
     const interval = setInterval(() => {
       console.log("time", timer, timeLimit);
-      if (timer === 0) {
+      if (timer === 1) {
         //memory round
         if (roundStatus === roundStates.preRound) {
           handleChangeRoundStatus(roundStates.preRound, roundStates.inGame);
-          clearInterval(interval);
         } else if (roundStatus === roundStates.inGame) {
           handleChangeRoundStatus(roundStates.inGame, roundStates.preRound);
-          clearInterval(interval);
         }
+        clearInterval(interval);
       }
       setTimer((prev) => prev - 1);
     }, 1000);

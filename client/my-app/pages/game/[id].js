@@ -41,7 +41,7 @@ export default function GameInstance({ socket, lobbyData, setLobbyData }) {
     });
   };
 
-  const handleChangeRoundStatus = (prev, cur, grid = []) => {
+  const handleChangeRoundStatus = (prev, cur) => {
     if (prev === roundStates.preRound && cur === roundStates.inGame) {
       // memo round end and start drawing round
       const blankGrid = new Array(boxes.length)
@@ -60,12 +60,7 @@ export default function GameInstance({ socket, lobbyData, setLobbyData }) {
         },
         (res) => {
           if (!res.success) {
-            document.querySelector(".invalid").innerHTML = `Error: ${
-              res.errMsg ?? ""
-            }.`;
-            console.log(`Error: ${res["errMsg"] ?? ""}. ${err}`);
-          } else if (res.success) {
-            setLobbyData({ ...lobbyData, players: [...res.data] });
+            console.log(`Error: ${res["errMsg"] ?? ""}.`);
           }
         }
       );
