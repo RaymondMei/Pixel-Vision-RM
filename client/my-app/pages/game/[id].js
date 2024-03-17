@@ -81,13 +81,18 @@ export default function GameInstance({ socket, lobbyData, setLobbyData }) {
     });
 
     socket.on("start_pre_round", (lobbyData) => {
-      setLobbyData(lobbyData);
-      setBoxes(lobbyData.grid);
-      setRound(lobbyData.round);
-      setScore(
-        lobbyData.players.find((player) => player.playerId === playerId)
-      );
-      setRoundStatus(roundStates.preRound);
+      console.log("starting pre round", lobbyData);
+      if (lobbyData.round > lobbyData.settings.totalRounds) {
+        setRoundStatus(roundStates.afterGame);
+      } else {
+        setLobbyData(lobbyData);
+        setBoxes(lobbyData.grid);
+        setRound(lobbyData.round);
+        setScore(
+          lobbyData.players.find((player) => player.playerId === playerId)
+        );
+        setRoundStatus(roundStates.preRound);
+      }
     });
 
     //note:
@@ -121,11 +126,7 @@ export default function GameInstance({ socket, lobbyData, setLobbyData }) {
   switch (roundStatus) {
     case roundStates.afterGame:
       return (
-        <Leaderboard
-          players={lobbyData?.players}
-          scores={score}
-          maxRounds={globalMaxRounds}
-        />
+        <Leaderboard players={lobbyData?.players} maxRounds={globalMaxRounds} />
       );
     case roundStates.inGame:
     case roundStates.preRound:
@@ -137,7 +138,6 @@ export default function GameInstance({ socket, lobbyData, setLobbyData }) {
           handleChangeRoundStatus={handleChangeRoundStatus}
           lobbyData={lobbyData}
           setLobbyData={setLobbyData}
-          score={score}
           boxes={boxes}
           setBoxes={setBoxes}
           round={round}

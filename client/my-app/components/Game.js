@@ -19,7 +19,7 @@ function Game({
   socket,
 }) {
   const router = useRouter();
-  const [displayedRound, setDisplayedRound] = useState(round);
+  // const [displayedRound, setDisplayedRound] = useState(round);
   const [timer, setTimer] = useState(timeLimit);
 
   const [colour, setColour] = useState("white");
@@ -82,7 +82,7 @@ function Game({
           className="bg-light bg-light mx-3 rounded shadow col-sm-6 d-flex flex-column justify-content-center align-items-center"
           style={{ height: "75vh", width: "75vh" }}
         >
-          <h1>Round: {displayedRound}</h1>
+          <h1>Round: {round}</h1>
           <GameGrid
             inGame={roundStatus === roundStates.inGame}
             height={boxes.length}
