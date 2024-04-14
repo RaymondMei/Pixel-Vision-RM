@@ -6,8 +6,7 @@ function ScoreListTile({ player, color, isAdmin }) {
       className="p-4 fs-3 text-center border-bottom list-group-item list-group-item-action"
       style={{ color: color }}
     >
-      <span className="start-0 ms-5 position-absolute">{`${player.score} `}</span>
-      <span>{`${player.name}`}</span>
+      <span className="start-0 ms-5 position-absolute">{`${player.score} ${player.name}`}</span>
 
       {isAdmin ? <AdminBadge /> : null}
     </div>

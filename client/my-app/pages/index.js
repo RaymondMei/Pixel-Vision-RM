@@ -21,10 +21,9 @@ function Home({
         .timeout(5000)
         .emit("create_lobby", { playerId, name }, (err, res) => {
           if (err || !res.success) {
-            document.querySelector(".invalid").innerHTML = `Error: ${
-              res.errMsg ?? ""
-            }.`;
-            console.log(`Error: ${res["errMsg"] ?? ""}.`);
+            document.querySelector(
+              ".invalid"
+            ).innerHTML = `Error creating lobby.`;
           } else if (res.success && "code" in res.data) {
             console.log("Created lobby " + res.data.code);
             setLobbyData(res.data);
@@ -40,10 +39,9 @@ function Home({
         .timeout(5000)
         .emit("join_lobby", { lobbyCode, playerId, name }, (err, res) => {
           if (err || !res.success) {
-            document.querySelector(".invalid").innerHTML = `Error: ${
-              res.errMsg ?? ""
-            }.`;
-            console.log(`Error: ${res["errMsg"] ?? ""}. ${err}`);
+            document.querySelector(
+              ".invalid"
+            ).innerHTML = `Error joining lobby.`;
           } else if (res.success && "code" in res.data) {
             console.log("Joined lobby " + res.data.code);
             setLobbyData(res.data);
