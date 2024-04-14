@@ -1,0 +1,31 @@
+version: "1.0"
+
+services:
+  mongodb:
+    image: "mongo"
+    volumes:
+      - data:/data/db
+
+  backend:
+    build: ./server
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./server:/express-backend/
+      - /express-backend/node_modules
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./client/my-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client/my-app:/react-frontend/
+    stdin_open: true
+    tty: true
+    depends_on:
+      - backend
+
+volumes:
+  data:
